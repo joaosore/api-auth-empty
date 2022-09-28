@@ -1,0 +1,41 @@
+version: '3.9'
+
+services:
+  db-empty:
+    container_name: db-empty
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: empty
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - postgres
+
+  api-empty:
+    container_name: api-empty
+    links:
+      - db-empty
+    depends_on:
+      - db-empty
+    build:
+      context: .
+      dockerfile: ./DockerfileDev
+    ports:
+      - 3001:3001
+    environment:
+      - POSTGRES_HOST=db-empty
+      - POSTGRES_PORT=5432
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DATABASE=empty
+    networks:
+      - postgres
+    restart: unless-stopped
+networks:
+  postgres:
+    driver: bridge
