@@ -1,18 +1,11 @@
-import cors from 'cors';
+import { swaggerRoutes } from '@config/swagger';
 import { Router } from 'express';
-
-import { authenticateRoutes } from './authenticate.routes';
-import { homeRoutes } from './home.routes';
-import { usersRoutes } from './users.routes';
+import { homeRoutes } from '../modules/home/route';
 
 const router = Router();
 
-router.use(cors());
-
 router.use('/', homeRoutes);
 
-router.use('/auth', authenticateRoutes);
-
-router.use('/users', usersRoutes);
+router.use('/doc', swaggerRoutes);
 
 export { router };

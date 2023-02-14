@@ -1,41 +1,26 @@
-import express, { Request, Response, NextFunction } from 'express';
-
 import 'reflect-metadata';
-import 'express-async-errors';
+import 'module-alias/register';
 
-import swaggerUi from 'swagger-ui-express';
+import { connectDatabase } from './database';
+import express from 'express';
 
-import './shared/container';
-import './shared/container/providers';
-
-import createConnection from './database';
 import { router } from './routes';
-import swaggerFile from './sagger.json';
-import { AppError } from './shared/erros/AppError';
-
-createConnection();
 
 const app = express();
+const port = 3001;
+
+import './containers';
+
+import bodyParser from 'body-parser';
 
 app.use(express.json());
 
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
-
 app.use(router);
 
-app.use(
-  (err: Error, request: Request, response: Response, next: NextFunction) => {
-    if (err instanceof AppError) {
-      return response.status(err.statusCode).json({
-        message: err.message,
-      });
-    }
+connectDatabase();
 
-    return response.status(500).json({
-      status: 'error',
-      message: `Internal server error - ${err.message}`,
-    });
-  },
-);
+app.use(bodyParser.json());
 
-app.listen(3007);
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
+});
